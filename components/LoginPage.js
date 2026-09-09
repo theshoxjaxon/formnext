@@ -10,25 +10,45 @@ const loginSchema = z.object({
     password: z.string().min(6, { message: "Paroliz judda kichkina" })
 })
 
+
 const LoginPage = () => {
 
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
 
     // Initialize react-hook-form with the Zod resolver (no TS generics needed)
-
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(loginSchema),
+    })
     // Handle form submission 
-    const handleSubmit = async (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();  // Page reload qilmaslik uchun
-        // API'ga jo'natish
-        const response = await fetch('/api/loading', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, password })
-        });
-
-        const data = await response.json();
-        console.log(data);
+        // Zod Resolver ni shu yerda ishlatamiz
+        try {
+            // API'ga jo'natish
+            const response = await fetch('/api/loading', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, password })
+            });
+            const data = await response.json();
+            console.log(data);
+            if (response.ok) {
+                alert('Muvaffaqiyatli kirildi!');
+                // Yangi sahifaga o'tish
+            }
+            else {
+                alert('Xato: ' + result.message);
+            }
+        } catch (err) {
+            console.log(err)
+            return
+        }
         // Qaytgan javobni ishlash
     }
 
